@@ -2,7 +2,6 @@ package com.example.intouch.Controller;
 
 
 import com.example.intouch.DTO.Filter;
-import com.example.intouch.DTO.Search;
 import com.example.intouch.Entity.User;
 import com.example.intouch.Service.UserService;
 import com.example.intouch.Utils.JwtTokenUtils;
@@ -63,8 +62,8 @@ public class UserController {
     }
 
     @GetMapping("/searchPerson")
-    public ResponseEntity<?> getSearchUserByName(@RequestBody Search search){
-        List<User> list = userService.getSearchUser(search.getName());
+    public ResponseEntity<?> getSearchUserByName(@RequestBody Filter filter){
+        List<User> list = userService.getSearchUser(filter.getName());
         if (list.size() != 0){
             return new ResponseEntity<>(list,HttpStatus.OK);
         }
