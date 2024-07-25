@@ -54,7 +54,7 @@ public class PhotoService {
     }
 
     private void copyFileNewDir(MultipartFile file, Photo photo, User user) throws IOException {
-        File fileDirectory = new File("/Users/aleksandrkrahmalev/IdeaProjects/InTouchCompany/Storage/" + user.getEmail() + "/photos");
+        File fileDirectory = new File("/Users/aleksandrkrahmalev/IdeaProjects/InTouch/Storage/" + user.getEmail() + "/photos");
         fileDirectory.mkdirs();
         File copyFile = new File(fileDirectory.getAbsolutePath() + "/" + file.getOriginalFilename());
         OutputStream os = new FileOutputStream(copyFile);
