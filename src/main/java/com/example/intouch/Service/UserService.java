@@ -2,6 +2,7 @@ package com.example.intouch.Service;
 
 
 import com.example.intouch.DTO.Filter;
+import com.example.intouch.DTO.UserEdit;
 import com.example.intouch.Entity.Friend;
 import com.example.intouch.Entity.Photo;
 import com.example.intouch.Entity.Role;
@@ -51,7 +52,7 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("Invalid username or password");
         }
         userNow = user;
-        return new org.springframework.security.core.userdetails.User(user.getFirstName(),
+        return new org.springframework.security.core.userdetails.User(user.getEmail(),
                 user.getPassword(), mapRolesToAuthorities(user.getRoles()));
     }
 
@@ -157,6 +158,11 @@ public class UserService implements UserDetailsService {
 
     }
 
+    public void editUser(UserEdit userEdit){
+        User user = getEditUser(userEdit);
+        userRepository.save(user);
+    }
+
     private List<User> getSearchByAge(List<User> list, int age){
         List<User> resultList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++){
@@ -182,6 +188,22 @@ public class UserService implements UserDetailsService {
         List<User> secondApproachList = getSearchByAge(firstApproachList, filter.getAge());
         List<User> thirdApproachList = getSearchByTown(secondApproachList, filter.getTown());
         return thirdApproachList;
+    }
+
+    private User getEditUser(UserEdit userEdit){
+        User user = getMyUser();
+        user.setFirstName(userEdit.getFirstName());
+        user.setLastName(userEdit.getLastName());
+        user.setDateBorn(userEdit.getDateBorn());
+        user.setAge(userEdit.getAge());
+        user.setEmail(userEdit.getEmail());
+        user.setPhone(userEdit.getPhone());
+        user.setAboutMe(userEdit.getAboutMe());
+        user.setTown(userEdit.getTown());
+        user.setLanguage(userEdit.getLanguage());
+        user.setLowSchool(userEdit.getLowSchool());
+        user.setHighSchool(userEdit.getHighSchool());
+        return user;
     }
 
 }

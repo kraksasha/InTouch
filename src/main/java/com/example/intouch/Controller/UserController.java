@@ -2,11 +2,15 @@ package com.example.intouch.Controller;
 
 
 import com.example.intouch.DTO.Filter;
+import com.example.intouch.DTO.UserEdit;
 import com.example.intouch.Entity.User;
 import com.example.intouch.Service.UserService;
 import com.example.intouch.Utils.JwtTokenUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +22,13 @@ public class UserController {
     private UserService userService;
     private PasswordEncoder passwordEncoder;
     private JwtTokenUtils jwtTokenUtils;
+    private AuthenticationManager authenticationManager;
 
-    public UserController(UserService userService, PasswordEncoder passwordEncoder, JwtTokenUtils jwtTokenUtils) {
+    public UserController(UserService userService, PasswordEncoder passwordEncoder, JwtTokenUtils jwtTokenUtils, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtils = jwtTokenUtils;
+        this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/create")
@@ -38,12 +44,17 @@ public class UserController {
 
     @PostMapping(value = "/auth")
     public ResponseEntity<?> createAuthToken(@RequestBody User user){
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+        } catch (BadCredentialsException e){
+            return new ResponseEntity<>("Не правильный логин или пароль", HttpStatus.UNAUTHORIZED);
+        }
         UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
         String token = jwtTokenUtils.generateToken(userDetails);
         return new ResponseEntity<>(token,HttpStatus.OK);
     }
 
-    @GetMapping("/mypage")
+    @GetMapping("/myPage")
     public ResponseEntity<User> getMyPage(){
         User user = userService.getMyUser();
         return new ResponseEntity<>(user,HttpStatus.OK);
@@ -92,5 +103,11 @@ public class UserController {
             return new ResponseEntity<>(list, HttpStatus.OK);
         }
         return new ResponseEntity<>("Никого не удалось найти", HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping("/editMyPage")
+    public ResponseEntity<?> editUserPage(@RequestBody UserEdit userEdit){
+        userService.editUser(userEdit);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
