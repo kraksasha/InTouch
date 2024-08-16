@@ -1,8 +1,8 @@
 package com.example.intouch.Controller;
 
 
-import com.example.intouch.DTO.Filter;
-import com.example.intouch.DTO.UserEdit;
+import com.example.intouch.Constant.Parametr;
+import com.example.intouch.DTO.*;
 import com.example.intouch.Entity.User;
 import com.example.intouch.Service.UserService;
 import com.example.intouch.Utils.JwtTokenUtils;
@@ -32,24 +32,25 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createNewUser(@RequestBody User user){
-        if (userService.checkUser(user)){
-            String passwordEncode = passwordEncoder.encode(user.getPassword());
-            user.setPassword(passwordEncode);
-            userService.addUser(user);
+    public ResponseEntity<?> createNewUser(@RequestBody UserReg userReg){
+        if (userService.checkUser(userReg)){
+            String passwordEncode = passwordEncoder.encode(userReg.getPassword());
+            userReg.setPassword(passwordEncode);
+            userService.addUser(userReg);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
         return new ResponseEntity<>("Пользователь с таким email существует", HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping(value = "/auth")
-    public ResponseEntity<?> createAuthToken(@RequestBody User user){
+    public ResponseEntity<?> createAuthToken(@RequestBody UserAuth userAuth) throws Exception {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userAuth.getEmail(), userAuth.getPassword()));
         } catch (BadCredentialsException e){
             return new ResponseEntity<>("Не правильный логин или пароль", HttpStatus.UNAUTHORIZED);
         }
-        UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
+        userService.encodePasswordCrypto(userAuth.getPassword());
+        UserDetails userDetails = userService.loadUserByUsername(userAuth.getEmail());
         String token = jwtTokenUtils.generateToken(userDetails);
         return new ResponseEntity<>(token,HttpStatus.OK);
     }
@@ -108,6 +109,20 @@ public class UserController {
     @PutMapping("/editMyPage")
     public ResponseEntity<?> editUserPage(@RequestBody UserEdit userEdit){
         userService.editUser(userEdit);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<?> changeUserPassword(@RequestBody PasswordChange passwordChange) throws Exception {
+        String encodePassword = passwordEncoder.encode(passwordChange.getNewPassword());
+        passwordChange.setEncodeNewPassword(encodePassword);
+        int result = userService.changePassword(passwordChange);
+        if (result == Parametr.typeWrongPassword){
+            return new ResponseEntity<>("Не правильный текущий пароль", HttpStatus.BAD_REQUEST);
+        }
+        if (result == Parametr.typeDoNotMatchPassword){
+            return new ResponseEntity<>("Пароли не совпадают", HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
