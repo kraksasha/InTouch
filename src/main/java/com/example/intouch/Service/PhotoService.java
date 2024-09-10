@@ -3,6 +3,7 @@ package com.example.intouch.Service;
 import com.example.intouch.Entity.Photo;
 import com.example.intouch.Entity.User;
 import com.example.intouch.Repository.PhotoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,14 +14,10 @@ import java.io.OutputStream;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PhotoService {
-    private PhotoRepository photoRepository;
-    private UserService userService;
-
-    public PhotoService(PhotoRepository photoRepository, UserService userService) {
-        this.photoRepository = photoRepository;
-        this.userService = userService;
-    }
+    private final PhotoRepository photoRepository;
+    private final UserService userService;
 
     public void addPhoto(MultipartFile file) throws IOException {
         Photo photo = new Photo();

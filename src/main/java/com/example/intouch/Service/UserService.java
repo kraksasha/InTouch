@@ -9,6 +9,7 @@ import com.example.intouch.Entity.User;
 import com.example.intouch.Repository.FriendRepository;
 import com.example.intouch.Repository.PhotoRepository;
 import com.example.intouch.Repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,23 +27,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-    private UserRepository userRepository;
-    private PhotoRepository photoRepository;
-    private FriendRepository friendRepository;
+    private final UserRepository userRepository;
+    private final PhotoRepository photoRepository;
+    private final FriendRepository friendRepository;
     private User userNow;
     private PasswordCrypto passwordCrypto;
-    private Cipher cipher;
-    private KeyGenerator keyGenerator;
-    private SecretKey secretKey;
-
-    public UserService(UserRepository userRepository, PhotoRepository photoRepository, FriendRepository friendRepository, Cipher cipher, KeyGenerator keyGenerator) {
-        this.userRepository = userRepository;
-        this.photoRepository = photoRepository;
-        this.friendRepository = friendRepository;
-        this.cipher = cipher;
-        this.keyGenerator = keyGenerator;
-    }
+    private final Cipher cipher;
+    private final KeyGenerator keyGenerator;
+    private final SecretKey secretKey;
 
     public User findByEmail(String email){
         List<User> list = userRepository.findAll();
@@ -193,7 +187,6 @@ public class UserService implements UserDetailsService {
 
     public void encodePasswordCrypto(String password) throws Exception {
         passwordCrypto = new PasswordCrypto();
-        secretKey = keyGenerator.generateKey();
         cipher.init(Cipher.ENCRYPT_MODE,secretKey);
         byte[] encryptPassword = cipher.doFinal(password.getBytes());
         String encodePassword = Base64.getEncoder().encodeToString(encryptPassword);

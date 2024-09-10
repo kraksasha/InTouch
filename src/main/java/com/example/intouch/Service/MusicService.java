@@ -3,6 +3,7 @@ package com.example.intouch.Service;
 import com.example.intouch.Entity.Music;
 import com.example.intouch.Entity.User;
 import com.example.intouch.Repository.MusicRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,15 +16,11 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MusicService {
 
-    private MusicRepository musicRepository;
-    private UserService userService;
-
-    public MusicService(MusicRepository musicRepository, UserService userService) {
-        this.musicRepository = musicRepository;
-        this.userService = userService;
-    }
+    private final MusicRepository musicRepository;
+    private final UserService userService;
 
     public void addMusic(MultipartFile file) throws IOException {
         Music music = new Music();

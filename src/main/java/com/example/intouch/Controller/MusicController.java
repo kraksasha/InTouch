@@ -2,6 +2,7 @@ package com.example.intouch.Controller;
 
 import com.example.intouch.Entity.Music;
 import com.example.intouch.Service.MusicService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,13 +13,10 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class MusicController {
 
-    private MusicService musicService;
-
-    public MusicController(MusicService musicService) {
-        this.musicService = musicService;
-    }
+    private final MusicService musicService;
 
     @PostMapping("/addMusic")
     public ResponseEntity<?> addNewMusic(@RequestParam("file") MultipartFile file) throws IOException {

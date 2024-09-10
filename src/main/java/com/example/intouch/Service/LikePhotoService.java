@@ -7,21 +7,17 @@ import com.example.intouch.Entity.Photo;
 import com.example.intouch.Entity.User;
 import com.example.intouch.Repository.LikePhotoRepository;
 import com.example.intouch.Repository.PhotoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class LikePhotoService {
-    private LikePhotoRepository likePhotoRepository;
-    private UserService userService;
-    private PhotoRepository photoRepository;
-
-    public LikePhotoService(LikePhotoRepository likePhotoRepository, UserService userService, PhotoRepository photoRepository) {
-        this.likePhotoRepository = likePhotoRepository;
-        this.userService = userService;
-        this.photoRepository = photoRepository;
-    }
+    private final LikePhotoRepository likePhotoRepository;
+    private final UserService userService;
+    private final PhotoRepository photoRepository;
 
     public void addLike(Long id){
         User user = userService.getMyUser();

@@ -3,6 +3,7 @@ package com.example.intouch.Controller;
 
 import com.example.intouch.Entity.Photo;
 import com.example.intouch.Service.PhotoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,12 +13,9 @@ import java.util.List;
 
 
 @RestController
+@RequiredArgsConstructor
 public class PhotoController {
-    private PhotoService photoService;
-
-    public PhotoController(PhotoService photoService) {
-        this.photoService = photoService;
-    }
+    private final PhotoService photoService;
 
     @PostMapping(value = "/addPhoto")
     public ResponseEntity<?> addNewPhoto(@RequestParam("file") MultipartFile file) throws IOException {

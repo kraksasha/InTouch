@@ -3,17 +3,14 @@ package com.example.intouch.Service;
 import com.example.intouch.Entity.CommentPhoto;
 import com.example.intouch.Entity.User;
 import com.example.intouch.Repository.CommentPhotoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CommentPhotoService {
-    private CommentPhotoRepository commentPhotoRepository;
-    private UserService userService;
-
-    public CommentPhotoService(CommentPhotoRepository commentPhotoRepository, UserService userService) {
-        this.commentPhotoRepository = commentPhotoRepository;
-        this.userService = userService;
-    }
+    private final CommentPhotoRepository commentPhotoRepository;
+    private final UserService userService;
 
     public void addComment(CommentPhoto commentPhoto, Long id){
         User user = userService.getMyUser();

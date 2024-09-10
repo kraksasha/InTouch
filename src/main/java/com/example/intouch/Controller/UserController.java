@@ -6,6 +6,7 @@ import com.example.intouch.DTO.*;
 import com.example.intouch.Entity.User;
 import com.example.intouch.Service.UserService;
 import com.example.intouch.Utils.JwtTokenUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,21 +16,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class UserController {
-    private UserService userService;
-    private PasswordEncoder passwordEncoder;
-    private JwtTokenUtils jwtTokenUtils;
-    private AuthenticationManager authenticationManager;
-
-    public UserController(UserService userService, PasswordEncoder passwordEncoder, JwtTokenUtils jwtTokenUtils, AuthenticationManager authenticationManager) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtTokenUtils = jwtTokenUtils;
-        this.authenticationManager = authenticationManager;
-    }
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenUtils jwtTokenUtils;
+    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/create")
     public ResponseEntity<?> createNewUser(@RequestBody UserReg userReg){

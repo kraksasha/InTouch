@@ -3,17 +3,15 @@ package com.example.intouch.Controller;
 
 import com.example.intouch.Entity.CommentPhoto;
 import com.example.intouch.Service.CommentPhotoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 public class CommentPhotoController {
-    private CommentPhotoService commentPhotoService;
-
-    public CommentPhotoController(CommentPhotoService commentPhotoService) {
-        this.commentPhotoService = commentPhotoService;
-    }
+    private final CommentPhotoService commentPhotoService;
 
     @PostMapping("/addComment/{id}")
     public ResponseEntity<?> addNewComment(@RequestBody CommentPhoto commentPhoto, @PathVariable(name = "id") Long id){
