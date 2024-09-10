@@ -35,7 +35,6 @@ public class UserService implements UserDetailsService {
     private User userNow;
     private PasswordCrypto passwordCrypto;
     private final Cipher cipher;
-    private final KeyGenerator keyGenerator;
     private final SecretKey secretKey;
 
     public User findByEmail(String email){

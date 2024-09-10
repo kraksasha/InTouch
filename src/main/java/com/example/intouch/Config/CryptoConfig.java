@@ -12,22 +12,15 @@ import java.security.NoSuchAlgorithmException;
 @Configuration
 public class CryptoConfig {
 
-    private KeyGenerator keyGenerator;
-
-    @Bean
-    public KeyGenerator getKeyGenerator() throws NoSuchAlgorithmException {
-        keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(128);
-        return keyGenerator;
-    }
-
     @Bean
     public Cipher getCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
         return Cipher.getInstance("AES");
     }
 
     @Bean
-    public SecretKey getSecretKey(){
+    public SecretKey getSecretKey() throws NoSuchAlgorithmException {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(128);
         SecretKey secretKey = keyGenerator.generateKey();
         return secretKey;
     }
