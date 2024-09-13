@@ -1,6 +1,5 @@
 package com.example.intouch.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -42,6 +41,8 @@ public class User {
     private String highSchool;
     @Column(name = "path_Avatar")
     private String pathAvatar;
+    @Column(name = "crypto_Pass")
+    private String cryptoPass;
 
     @ManyToMany
     @JoinTable(name = "users_roles",
@@ -58,6 +59,5 @@ public class User {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Music> musics;
-
 
 }

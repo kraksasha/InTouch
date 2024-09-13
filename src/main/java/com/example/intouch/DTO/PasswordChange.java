@@ -8,5 +8,5 @@ public class PasswordChange {
     private String oldPassword;
     private String newPassword;
     private String confirmPassword;
-    private String encodeNewPassword;
+    private String encodedNewPassword;
 }

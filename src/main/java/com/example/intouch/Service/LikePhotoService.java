@@ -21,8 +21,9 @@ public class LikePhotoService {
 
     public void addLike(Long id){
         User user = userService.getMyUser();
-        if (checkLike(id)){
+        if (checkLike(id, user)){
             LikePhoto likePhoto = new LikePhoto();
+            System.out.println(user.getId());
             likePhoto.setAuthorId(user.getId());
             likePhoto.setPhotoId(id);
             likePhotoRepository.save(likePhoto);
@@ -33,9 +34,8 @@ public class LikePhotoService {
         likePhotoRepository.deleteById(id);
     }
 
-    private boolean checkLike(Long id){
+    private boolean checkLike(Long id, User user){
         Photo photo = photoRepository.findById(id).get();
-        User user = userService.getMyUser();
         List<LikePhoto> list = photo.getLikes();
         for (int i = 0; i < list.size(); i++){
             if (user.getId() == list.get(i).getAuthorId()){

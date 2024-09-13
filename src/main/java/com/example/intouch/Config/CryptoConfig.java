@@ -8,13 +8,15 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 @Configuration
 public class CryptoConfig {
 
     @Bean
     public Cipher getCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        return Cipher.getInstance("AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        return cipher;
     }
 
     @Bean

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class LikePhotoController {
-    private LikePhotoService likePhotoService;
+    private final LikePhotoService likePhotoService;
 
     @PostMapping("/addLike/{id}")
     public ResponseEntity<?> addNewLike(@PathVariable(name = "id") Long id){

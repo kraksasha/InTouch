@@ -10,16 +10,17 @@ import com.example.intouch.Repository.FriendRepository;
 import com.example.intouch.Repository.PhotoRepository;
 import com.example.intouch.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
+import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -32,10 +33,8 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PhotoRepository photoRepository;
     private final FriendRepository friendRepository;
-    private User userNow;
-    private PasswordCrypto passwordCrypto;
     private final Cipher cipher;
-    private final SecretKey secretKey;
+    private final SecretService secretService;
 
     public User findByEmail(String email){
         List<User> list = userRepository.findAll();
@@ -53,7 +52,6 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("Invalid username or password");
         }
-        userNow = user;
         return new org.springframework.security.core.userdetails.User(user.getEmail(),
                 user.getPassword(), mapRolesToAuthorities(user.getRoles()));
     }
@@ -64,12 +62,17 @@ public class UserService implements UserDetailsService {
                 SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
-    public void addUser(UserReg userReg){
+    public void addUser(UserReg userReg, String password) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        secretService.addSecret();
+        cipher.init(Cipher.ENCRYPT_MODE,secretService.getSecretKey());
+        byte[] encryptPassword = cipher.doFinal(password.getBytes());
+        String encodePassword = Base64.getEncoder().encodeToString(encryptPassword);
         User user = new User();
         user.setFirstName(userReg.getFirstName());
         user.setLastName(userReg.getLastName());
         user.setEmail(userReg.getEmail());
         user.setPassword(userReg.getPassword());
+        user.setCryptoPass(encodePassword);
         userRepository.save(user);
     }
 
@@ -84,7 +87,8 @@ public class UserService implements UserDetailsService {
     }
 
     public User getMyUser(){
-        User user = userRepository.findById(userNow.getId()).get();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = findByEmail(authentication.getName());
         return user;
     }
 
@@ -171,30 +175,30 @@ public class UserService implements UserDetailsService {
     }
 
     public int changePassword(PasswordChange passwordChange) throws Exception {
-        String userPassword = decodePasswordCrypto(passwordCrypto.getPassword());
+        User user = getMyUser();
+        String userPassword = decodePasswordCrypto(user.getCryptoPass());
         if (!passwordChange.getOldPassword().equals(userPassword)){
             return 1;
         }
         if (!passwordChange.getNewPassword().equals(passwordChange.getConfirmPassword())){
             return 2;
         }
-        User user = getMyUser();
-        user.setPassword(passwordChange.getEncodeNewPassword());
+        String cryptoNewPassword = encodePasswordCrypto(passwordChange.getNewPassword());
+        user.setPassword(passwordChange.getEncodedNewPassword());
+        user.setCryptoPass(cryptoNewPassword);
         userRepository.save(user);
         return 3;
     }
 
-    public void encodePasswordCrypto(String password) throws Exception {
-        passwordCrypto = new PasswordCrypto();
-        cipher.init(Cipher.ENCRYPT_MODE,secretKey);
+    public String encodePasswordCrypto(String password) throws Exception {
+        cipher.init(Cipher.ENCRYPT_MODE,secretService.getSecretKey());
         byte[] encryptPassword = cipher.doFinal(password.getBytes());
         String encodePassword = Base64.getEncoder().encodeToString(encryptPassword);
-        passwordCrypto.setPassword(encodePassword);
-        System.out.println(encodePassword);
+        return encodePassword;
     }
 
     private String decodePasswordCrypto(String password) throws Exception {
-        cipher.init(Cipher.DECRYPT_MODE,secretKey);
+        cipher.init(Cipher.DECRYPT_MODE,secretService.getSecretKey());
         byte[] decryptPassword = cipher.doFinal(Base64.getDecoder().decode(password));
         String decodePassword = new String(decryptPassword);
         return decodePassword;

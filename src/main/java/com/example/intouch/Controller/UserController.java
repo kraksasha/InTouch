@@ -17,6 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.security.InvalidKeyException;
 import java.util.List;
 
 @RestController
@@ -28,24 +31,24 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createNewUser(@RequestBody UserReg userReg){
+    public ResponseEntity<?> createNewUser(@RequestBody UserReg userReg) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         if (userService.checkUser(userReg)){
-            String passwordEncode = passwordEncoder.encode(userReg.getPassword());
+            String password = userReg.getPassword();
+            String passwordEncode = passwordEncoder.encode(password);
             userReg.setPassword(passwordEncode);
-            userService.addUser(userReg);
+            userService.addUser(userReg,password);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
         return new ResponseEntity<>("Пользователь с таким email существует", HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping(value = "/auth")
-    public ResponseEntity<?> createAuthToken(@RequestBody UserAuth userAuth) throws Exception {
+    public ResponseEntity<?> createAuthToken(@RequestBody UserAuth userAuth) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userAuth.getEmail(), userAuth.getPassword()));
         } catch (BadCredentialsException e){
             return new ResponseEntity<>("Не правильный логин или пароль", HttpStatus.UNAUTHORIZED);
         }
-        userService.encodePasswordCrypto(userAuth.getPassword());
         UserDetails userDetails = userService.loadUserByUsername(userAuth.getEmail());
         String token = jwtTokenUtils.generateToken(userDetails);
         return new ResponseEntity<>(token,HttpStatus.OK);
@@ -110,8 +113,8 @@ public class UserController {
 
     @PutMapping("/changePassword")
     public ResponseEntity<?> changeUserPassword(@RequestBody PasswordChange passwordChange) throws Exception {
-        String encodePassword = passwordEncoder.encode(passwordChange.getNewPassword());
-        passwordChange.setEncodeNewPassword(encodePassword);
+        String encodedPassword = passwordEncoder.encode(passwordChange.getNewPassword());
+        passwordChange.setEncodedNewPassword(encodedPassword);
         int result = userService.changePassword(passwordChange);
         if (result == Parametr.typeWrongPassword){
             return new ResponseEntity<>("Не правильный текущий пароль", HttpStatus.BAD_REQUEST);
