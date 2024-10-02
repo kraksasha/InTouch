@@ -1,6 +1,7 @@
 package com.example.intouch.Config;
 
 import com.example.intouch.Service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,14 +19,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
-    private UserService userService;
-    private JwtRequestFilter jwtRequestFilter;
-
-    public SecurityConfig(UserService userService, JwtRequestFilter jwtRequestFilter) {
-        this.userService = userService;
-        this.jwtRequestFilter = jwtRequestFilter;
-    }
+    private final UserService userService;
+    private final JwtRequestFilter jwtRequestFilter;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -58,10 +55,21 @@ public class SecurityConfig {
                 .requestMatchers("/changeAvatar/{id}").authenticated()
                 .requestMatchers("/addFriend/{id}").authenticated()
                 .requestMatchers("/myFriends").authenticated()
+                .requestMatchers("/searchPerson").authenticated()
+                .requestMatchers("/searchPersonFilter").authenticated()
                 .requestMatchers("/addPhoto").authenticated()
+                .requestMatchers("/deletePhoto/{id}").authenticated()
+                .requestMatchers("/photo/{id}").authenticated()
                 .requestMatchers("/addMusic").authenticated()
+                .requestMatchers("/deleteMusic/{id}").authenticated()
+                .requestMatchers("/downloadMusic/{id}").authenticated()
+                .requestMatchers("/searchMusic").authenticated()
+                .requestMatchers("/addLikeMusic/{id}").authenticated()
+                .requestMatchers("/deleteLikeMusic/{id}").authenticated()
                 .requestMatchers("/addLike/{id}").authenticated()
+                .requestMatchers("/deleteLike/{id}").authenticated()
                 .requestMatchers("/addComment/{id}").authenticated()
+                .requestMatchers("/deleteComment/{id}").authenticated()
                 .requestMatchers("/users").authenticated()
                 .anyRequest().permitAll()
                 .and()

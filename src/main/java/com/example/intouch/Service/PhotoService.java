@@ -56,6 +56,7 @@ public class PhotoService {
         File copyFile = new File(fileDirectory.getAbsolutePath() + "/" + file.getOriginalFilename());
         OutputStream os = new FileOutputStream(copyFile);
         os.write(file.getBytes());
+        os.close();
         copyFile.mkdirs();
         photo.setNamePhoto(copyFile.getName());
         photo.setPathToPhoto(copyFile.getAbsolutePath());

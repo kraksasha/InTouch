@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -62,9 +63,21 @@ public class MusicService {
         File copyFile = new File(fileDirectory.getAbsolutePath() + "/" + file.getOriginalFilename());
         OutputStream os = new FileOutputStream(copyFile);
         os.write(file.getBytes());
+        os.close();
         copyFile.mkdirs();
         music.setNameMusic(copyFile.getName());
         music.setPathToMusic(copyFile.getAbsolutePath());
         music.setUserId(user.getId());
+    }
+
+    public List<Music> getSearchMusic(String name){
+        List<Music> resultList = new ArrayList<>();
+        List<Music> list = musicRepository.findAll();
+        for (int i = 0; i < list.size(); i++){
+            if (list.get(i).getNameMusic().contains(name)){
+                resultList.add(list.get(i));
+            }
+        }
+        return resultList;
     }
 }

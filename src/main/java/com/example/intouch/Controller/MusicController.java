@@ -1,5 +1,6 @@
 package com.example.intouch.Controller;
 
+import com.example.intouch.DTO.Filter;
 import com.example.intouch.Entity.Music;
 import com.example.intouch.Service.MusicService;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +53,14 @@ public class MusicController {
     public ResponseEntity<?> downloadMusicById(@PathVariable(name = "id") Long id) throws IOException {
         byte[] array = musicService.downloadMusic(id);
         return new ResponseEntity<>(array,HttpStatus.OK);
+    }
+
+    @GetMapping("/searchMusic")
+    public ResponseEntity<?> getSearchMusicByName(@RequestBody Filter filter){
+        List<Music> list = musicService.getSearchMusic(filter.getName());
+        if (list.size() != 0){
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Ничего не найдено", HttpStatus.BAD_REQUEST);
     }
 }
