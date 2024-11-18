@@ -5,7 +5,6 @@ import com.example.intouch.Entity.Music;
 import com.example.intouch.Service.MusicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,9 +18,9 @@ public class MusicController {
 
     private final MusicService musicService;
 
-    @PostMapping("/addMusic")
-    public ResponseEntity<?> addNewMusic(@RequestParam("file") MultipartFile file) throws IOException {
-        musicService.addMusic(file);
+    @PostMapping("/uploadMusic")
+    public ResponseEntity<?> uploadNewMusic(@RequestParam("file") MultipartFile file) throws IOException {
+        musicService.uploadMusic(file);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -62,5 +61,11 @@ public class MusicController {
             return new ResponseEntity<>(list, HttpStatus.OK);
         }
         return new ResponseEntity<>("Ничего не найдено", HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/addMusic/{id}")
+    public ResponseEntity<?> addNewMusic(@PathVariable(name = "id") Long id){
+        musicService.addMusic(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

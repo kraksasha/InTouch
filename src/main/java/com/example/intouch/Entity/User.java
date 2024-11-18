@@ -51,13 +51,17 @@ public class User {
 
     private Collection<Role> roles;
 
+    @ManyToMany
+    @JoinTable(name = "users_musics",
+            joinColumns = @JoinColumn(name = "user_Id"),
+            inverseJoinColumns = @JoinColumn(name = "music_Id"))
+
+    private List<Music> musics;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Photo> photos;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Friend> friends;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private List<Music> musics;
 
 }

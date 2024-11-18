@@ -2,7 +2,9 @@ package com.example.intouch.Service;
 
 import com.example.intouch.Entity.Music;
 import com.example.intouch.Entity.User;
+import com.example.intouch.Entity.UserMusic;
 import com.example.intouch.Repository.MusicRepository;
+import com.example.intouch.Repository.UserMusicRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,12 +24,17 @@ public class MusicService {
 
     private final MusicRepository musicRepository;
     private final UserService userService;
+    private final UserMusicRepository userMusicRepository;
 
-    public void addMusic(MultipartFile file) throws IOException {
+    public void uploadMusic(MultipartFile file) throws IOException {
         Music music = new Music();
+        UserMusic userMusic = new UserMusic();
         User user = userService.getMyUser();
         copyFileNewDir(file,music,user);
-        musicRepository.save(music);
+        Music musicBd = musicRepository.save(music);
+        userMusic.setUserId(user.getId());
+        userMusic.setMusicId(musicBd.getId());
+        userMusicRepository.save(userMusic);
     }
 
      public List<Music> getMyMusics(){
@@ -37,10 +44,17 @@ public class MusicService {
      }
 
      public void deleteMusic(Long id){
-        Music music = musicRepository.findById(id).get();
-        File fileDelete = new File(music.getPathToMusic());
-        fileDelete.delete();
-        musicRepository.deleteById(id);
+        User user = userService.getMyUser();
+        List<UserMusic> list = userMusicRepository.findAll();
+        for (int i = 0; i < list.size(); i++){
+            if (list.get(i).getUserId().equals(user.getId()) && list.get(i).getMusicId().equals(id)){
+                userMusicRepository.delete(list.get(i));
+            }
+        }
+//        Music music = musicRepository.findById(id).get();
+//        File fileDelete = new File(music.getPathToMusic());
+//        fileDelete.delete();
+//        musicRepository.deleteById(id);
      }
 
      public List<Music> getUserMusics(Long id){
@@ -65,9 +79,15 @@ public class MusicService {
         os.write(file.getBytes());
         os.close();
         copyFile.mkdirs();
+        List<Music> list = musicRepository.findAll();
+        for (int i = 0; i < list.size(); i++){
+            if (list.get(i).getPathToMusic().equals(copyFile.getAbsolutePath())){
+                music.setId(list.get(i).getId());
+                break;
+            }
+        }
         music.setNameMusic(copyFile.getName());
         music.setPathToMusic(copyFile.getAbsolutePath());
-        music.setUserId(user.getId());
     }
 
     public List<Music> getSearchMusic(String name){
@@ -79,5 +99,13 @@ public class MusicService {
             }
         }
         return resultList;
+    }
+
+    public void addMusic(Long id){
+        UserMusic userMusic = new UserMusic();
+        User user = userService.getMyUser();
+        userMusic.setUserId(user.getId());
+        userMusic.setMusicId(id);
+        userMusicRepository.save(userMusic);
     }
 }

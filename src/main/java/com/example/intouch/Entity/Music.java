@@ -19,13 +19,14 @@ public class Music {
     private String nameMusic;
     @Column(name = "path_To_Music")
     private String pathToMusic;
-    @Column(name = "user_Id")
-    private Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_Id", insertable = false, updatable = false)
+    @ManyToMany
+    @JoinTable(name = "users_musics",
+            joinColumns = @JoinColumn(name = "music_Id"),
+            inverseJoinColumns = @JoinColumn(name = "user_Id"))
     @JsonIgnore
-    private User user;
+
+    private List<User> users;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "music")
     private List<LikeMusic> likes;
