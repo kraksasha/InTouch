@@ -55,9 +55,10 @@ public class UserController {
     }
 
     @GetMapping("/myPage")
-    public ResponseEntity<User> getMyPage(){
+    public ResponseEntity<UserOut> getMyPage(){
         User user = userService.getMyUser();
-        return new ResponseEntity<>(user,HttpStatus.OK);
+        UserOut userOut = userService.getUserOut(user);
+        return new ResponseEntity<>(userOut,HttpStatus.OK);
     }
 
     @PutMapping("/changeAvatar/{id}")
@@ -67,14 +68,15 @@ public class UserController {
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable(name = "id") Long id){
+    public ResponseEntity<UserOut> getUserById(@PathVariable(name = "id") Long id){
         User user = userService.getUser(id);
-        return new ResponseEntity<>(user,HttpStatus.OK);
+        UserOut userOut = userService.getUserOut(user);
+        return new ResponseEntity<>(userOut,HttpStatus.OK);
     }
 
     @GetMapping("/searchPerson")
     public ResponseEntity<?> getSearchUserByName(@RequestBody Filter filter){
-        List<User> list = userService.getSearchUser(filter.getName());
+        List<UserOut> list = userService.getSearchFilterUser(filter);
         if (list.size() != 0){
             return new ResponseEntity<>(list,HttpStatus.OK);
         }
@@ -98,7 +100,7 @@ public class UserController {
 
     @GetMapping("/searchPersonFilter")
     public ResponseEntity<?> getSearchUserByFilter(@RequestBody Filter filter){
-        List<User> list = userService.getSearchFilterUser(filter);
+        List<UserOut> list = userService.getSearchFilterUser(filter);
         if (list.size() != 0){
             return new ResponseEntity<>(list, HttpStatus.OK);
         }

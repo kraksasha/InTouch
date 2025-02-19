@@ -49,12 +49,9 @@ public class MusicService {
         for (int i = 0; i < list.size(); i++){
             if (list.get(i).getUserId().equals(user.getId()) && list.get(i).getMusicId().equals(id)){
                 userMusicRepository.delete(list.get(i));
+                break;
             }
         }
-//        Music music = musicRepository.findById(id).get();
-//        File fileDelete = new File(music.getPathToMusic());
-//        fileDelete.delete();
-//        musicRepository.deleteById(id);
      }
 
      public List<Music> getUserMusics(Long id){

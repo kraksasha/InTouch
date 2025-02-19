@@ -92,6 +92,27 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+    public UserOut getUserOut(User user){
+        UserOut userOut = new UserOut();
+        userOut.setId(user.getId());
+        userOut.setFirstName(user.getFirstName());
+        userOut.setLastName(user.getLastName());
+        userOut.setDateBorn(user.getDateBorn());
+        userOut.setAge(user.getAge());
+        userOut.setEmail(user.getEmail());
+        userOut.setPhone(user.getPhone());
+        userOut.setAboutMe(user.getAboutMe());
+        userOut.setTown(user.getTown());
+        userOut.setLanguage(user.getLanguage());
+        userOut.setLowSchool(user.getLowSchool());
+        userOut.setHighSchool(user.getHighSchool());
+        userOut.setPathAvatar(user.getPathAvatar());
+        userOut.setPhotos(user.getPhotos());
+        userOut.setMusics(user.getMusics());
+        userOut.setFriends(user.getFriends());
+        return userOut;
+    }
+
     public void changeAvatar(Long id){
          Photo photo = photoRepository.findById(id).get();
          User user = getMyUser();
@@ -106,7 +127,7 @@ public class UserService implements UserDetailsService {
 
     public List<User> getSearchUser(String name){
         List<User> resultList = new ArrayList<>();
-        if (name.equals("")){
+        if (name == null){
             return resultList;
         }
         List<User> list = userRepository.findAll();
@@ -151,19 +172,27 @@ public class UserService implements UserDetailsService {
         return list;
     }
 
-    public List<User> getSearchFilterUser(Filter filter){
-        List<User> list = new ArrayList<>();
+    public List<UserOut> getSearchFilterUser(Filter filter){
+        List<UserOut> list = new ArrayList<>();
         if (filter.getName() != null && filter.getAge() == 0 && filter.getTown() == null){
-            return getSearchUser(filter.getName());
+            List<User> initialList = getSearchUser(filter.getName());
+            List<UserOut> resultList = getSearchUserOut(initialList);
+            return resultList;
         }
         if (filter.getName() != null && filter.getAge() != 0 && filter.getTown() == null){
-            return getSearchByAge(getSearchUser(filter.getName()), filter.getAge());
+            List<User> initialList = getSearchByAge(getSearchUser(filter.getName()), filter.getAge());
+            List<UserOut> resultList = getSearchUserOut(initialList);
+            return resultList;
         }
         if (filter.getName() != null && filter.getAge() == 0 && filter.getTown() != null){
-            return getSearchByTown(getSearchUser(filter.getName()), filter.getTown());
+            List<User> initialList = getSearchByTown(getSearchUser(filter.getName()), filter.getTown());
+            List<UserOut> resultList = getSearchUserOut(initialList);
+            return resultList;
         }
         if (filter.getName() != null && filter.getAge() != 0 && filter.getTown() != null){
-            return getSearchUserByAllFilter(filter);
+            List<User> initialList = getSearchUserByAllFilter(filter);
+            List<UserOut> resultList = getSearchUserOut(initialList);
+            return resultList;
         }
         return list;
 
@@ -245,6 +274,15 @@ public class UserService implements UserDetailsService {
         user.setLowSchool(userEdit.getLowSchool());
         user.setHighSchool(userEdit.getHighSchool());
         return user;
+    }
+
+    public List<UserOut> getSearchUserOut(List<User> list){
+        List<UserOut> resultList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++){
+            UserOut userOut = getUserOut(list.get(i));
+            resultList.add(userOut);
+        }
+        return resultList;
     }
 
 }
